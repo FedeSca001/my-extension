@@ -1,4 +1,4 @@
-const lapsos = 50000; // cada 50 segundos
+const lapsos = 90000;
 
 // Detectar movimiento del mouse
 let mouseInactive = true;
