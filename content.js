@@ -1,39 +1,42 @@
-let positionX = null;
-let positionY = null;
-const lapsos = 3000;
-let mouseInactive = true;
-let lastX = null;
-let lastY = null;
+const lapsos = 50000; // cada 50 segundos
 
 // Detectar movimiento del mouse
+let mouseInactive = true;
 document.addEventListener("mousemove", (e) => {
-  positionX = e.clientX;
-  positionY = e.clientY;  
-  mouseInactive = false; // Hay actividad, marcar como activo
+  mouseInactive = false; // hay actividad
 });
-
-// “Bucle infinito” revisando la inactividad
-// Cada cierto tiempo, simula un "mousemove" para YouTube
-setInterval(() => {
-  const evt = new MouseEvent('mousemove', {
-    bubbles: true,
-    cancelable: true,
-    clientX: 0,
-    clientY: 0
-  });
-  document.dispatchEvent(evt);
-  console.log("Actividad simulada para YouTube");
-}, 20000); // cada 20 segundos // revisa cada 100ms para estar “constante”
 
 // Detectar cualquier tecla
 document.addEventListener("keydown", (e) => {
-  mouseInactive = false; // Teclado también cuenta como actividad
+  mouseInactive = false; // teclado también cuenta como actividad
   if (e.key === "p") {
     console.log("La tecla 'p' fue presionada");
     chrome.runtime.sendMessage({ action: 'toggleKeepAwake' }, (response) => {
       console.log('Keep awake toggled:', response.status);
     });
+    window.open('https://www.youtube.com/shorts/qJRYhoyGtwM', '_blank');
   } else {
     console.log(`Tecla presionada: ${e.key}`);
   }
 });
+
+// “Bucle infinito” para pausar y reproducir el video y simular actividad
+setInterval(() => {
+  const video = document.querySelector('video'); // capturamos el video
+  if (video) {
+    if (video.paused) {
+      console.log('esta pausado');
+    } else {
+    video.pause(); // pausar inmediatamente
+    console.log("Video pausado automáticamente");
+
+    setTimeout(() => {
+      video.play(); // reproducir después de 10 ms
+      console.log("Video reproducido automáticamente");
+    }, 10); // 10 milisegundos
+  }
+  }
+  // Simular actividad para YouTube
+  document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, cancelable: true, clientX: 0, clientY: 0 }));
+  console.log("Actividad simulada para YouTube");
+}, lapsos); // intervalo definido por lapsos
